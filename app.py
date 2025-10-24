@@ -27,7 +27,7 @@ arq_micro = "./microdados_ed_basica_2024.csv"
 arq_suple = "./suplemento_cursos_tecnicos_2024.csv"
 
 # CSV específico da análise de storytelling (ficar ao lado do app, ou ajuste o path conforme necessário)
-arq_story = Path("dados_limpos_educacao.csv")
+arq_story = Path("./dados_limpos_educacao.csv")
 
 # =====================================================
 # 🚀 CARREGAMENTO E PREPARAÇÃO DOS DADOS (Dashboard)
@@ -190,14 +190,14 @@ st.success(f"🎓 Total de Escolas Filtradas: {total_escolas_unicas:,}")
 # =====================================================
 # 🧭 ABAS
 # =====================================================
-aba0, aba1, aba2, aba3, aba4, aba5, aba6 = st.tabs([
-    "📖 Storytelling",
+aba0, aba1, aba2, aba3, aba4 = st.tabs([
+    "📖 Abismo Digital",
     "🎓 Cursos Técnicos",
     "🏫 Dependência Administrativa",
     "📍 Municípios",
     "🏗️ Estrutura",
-    "📈 Indicadores Nacionais",
-    "📈 Estatística Descritiva"
+    # "📈 Indicadores Nacionais",
+    # "📈 Estatística Descritiva"
 ])
 
 # =====================================================
@@ -218,23 +218,35 @@ with aba0:
         st.stop()
 
     # --- 1. Título e Introdução (Storytelling) ---
-    st.subheader("O Abismo Digital na Educação Básica Brasileira")
-    st.subheader("Uma Análise da Relação entre Infraestrutura Tecnológica e Matrículas (Censo Escolar 2024)")
+    # st.subheader("O Abismo Digital na Educação Básica Brasileira")
+    # st.subheader("Uma Análise da Relação entre Infraestrutura Tecnológica e Matrículas (Censo Escolar 2024)")
 
     total_escolas = df_st.shape[0]
     total_matriculas = df_st['MATRICULAS'].sum()
-    st.markdown(f"""
-    O **acesso à tecnologia** nas escolas é um indicador crucial de equidade educacional. 
-    Nesta análise, atuamos como Cientistas de Dados para quantificar a disparidade de recursos digitais entre a rede pública e privada de ensino no Brasil.
+    # st.markdown(f"""
+    # O **acesso à tecnologia** nas escolas é um indicador crucial de equidade educacional. 
+    # Nesta análise, atuamos como Cientistas de Dados para quantificar a disparidade de recursos digitais entre a rede pública e privada de ensino no Brasil.
 
-    - **Total de Escolas Analisadas:** {total_escolas:,}
-    - **Total de Matrículas:** {total_matriculas:,.0f}
-    """)
+    # - **Total de Escolas Analisadas:** {total_escolas:,}
+    # - **Total de Matrículas:** {total_matriculas:,.0f}
+    # """)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(label="Total de Escolas Analisadas", value=f"{total_escolas:,}".replace(",", "."))
+
+    with col2:
+        st.metric(
+        label="Total de Matrículas",
+        value=f"{total_matriculas:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    )
+
+    
 
     st.markdown("---")
 
     # --- 2. O Abismo Público vs. Privado (Análise Comparativa) ---
-    st.header("2. O Abismo Público vs. Privado")
+    # st.header("2. O Abismo Público vs. Privado")
     st.markdown("""
     A métrica fundamental para esta análise é a **média de Equipamentos por Aluno (EQP/Aluno)**, que considera computadores de mesa, portáteis e tablets.
     """)
@@ -257,12 +269,18 @@ with aba0:
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Média EQP/Aluno (Rede Pública)", value=f"{(media_eqp_publica or 0):.4f}")
+        st.metric(label="Média EQP/Aluno (Rede Pública)", value=f"{(media_eqp_publica or 0):.4f}".replace(".", ","))
+
     with col2:
-        st.metric(label="Média EQP/Aluno (Rede Privada)", value=f"{(media_eqp_privada or 0):.4f}")
+        st.metric(label="Média EQP/Aluno (Rede Privada)", value=f"{(media_eqp_privada or 0):.4f}".replace(".", ","))
+
     with col3:
         delta_txt = "Maior na Privada" if not pd.isna(razao) else "Indisponível"
-        st.metric(label="Disparidade (Razão Privada/Pública)", value=f"{(razao or 0):.1f}x", delta=delta_txt)
+        st.metric(
+            label="Disparidade (Razão Privada/Pública)",
+            value=f"{(razao or 0):.1f}".replace(".", ",") + "x",
+            delta=delta_txt
+        )
 
     # Gráfico de Distribuição (Boxplot)
     st.markdown("#### Distribuição de Equipamentos por Aluno")
@@ -279,9 +297,9 @@ with aba0:
     st.markdown("---")
 
     # --- 3. Profundidade Regional ---
-    st.header("3. Profundidade Regional: Onde a Desigualdade é Mais Evidente?")
+    # st.header("Profundidade Regional: Onde a Desigualdade é Mais Evidente?")
     st.markdown("""
-    A disparidade tecnológica não é uniforme no país. Ao analisar a diferença de EQP/Aluno por Região, podemos identificar as áreas que mais necessitam de atenção.
+    Disparidade tecnológica EQP/Aluno por Região
     """)
 
     df_regional = df_st.groupby(['REGIAO', 'TIPO_ESCOLA'])['EQP_POR_ALUNO'].mean().unstack()
@@ -310,10 +328,10 @@ with aba0:
     st.markdown("---")
 
     # --- 4. Infraestrutura e Engajamento (Modelagem Estatística) ---
-    st.header("4. Infraestrutura e Engajamento: Correlação e Modelagem")
-    st.markdown("""
-    Para testar nossa hipótese de que a infraestrutura tecnológica impacta o engajamento (medido pelo número de matrículas), aplicamos uma **Regressão Linear Simples**.
-    """)
+    # st.header("4. Infraestrutura e Engajamento: Correlação e Modelagem")
+    # st.markdown("""
+    # Para testar nossa hipótese de que a infraestrutura tecnológica impacta o engajamento (medido pelo número de matrículas), aplicamos uma **Regressão Linear Simples**.
+    # """)
 
     # Preparação dos dados para Modelagem
     df_model = df_st[(df_st['MATRICULAS'] > 0) & (df_st['TOTAL_EQUIPAMENTOS'] > 0)].copy()
@@ -325,8 +343,8 @@ with aba0:
 
         # Correlação de Pearson
         correlation = df_model['LOG_EQP'].corr(df_model['LOG_MATRICULAS'])
-        st.info(f"**Correlação de Pearson** (Log Equipamentos vs. Log Matrículas): **{correlation:.3f}**")
-        st.caption("Uma correlação positiva e forte indica que, em geral, escolas com mais equipamentos tendem a ter mais matrículas.")
+        # st.info(f"**Correlação de Pearson** (Log Equipamentos vs. Log Matrículas): **{correlation:.3f}**")
+        # st.caption("Uma correlação positiva e forte indica que, em geral, escolas com mais equipamentos tendem a ter mais matrículas.")
 
         # Regressão Linear Simples
         X = df_model[['LOG_EQP']]
@@ -353,34 +371,31 @@ with aba0:
     st.markdown("---")
 
     # --- 5. Conclusão e Insights ---
-    st.header("5. Conclusão e Caminhos para a Inclusão Digital")
-    st.markdown("""
-    A análise quantitativa confirma a **desigualdade digital** e a **importância da infraestrutura** para o engajamento escolar.
-    """)
+    # st.header("5. Conclusão e Caminhos para a Inclusão Digital")
+    # st.markdown("""
+    # A análise quantitativa confirma a **desigualdade digital** e a **importância da infraestrutura** para o engajamento escolar.
+    # """)
 
-    st.markdown("#### 5.1 Sugestão de Hipóteses e Conclusões (Requisito 3 e 4.1)")
-    st.markdown("""
-    1.  **Hipótese Confirmada:** A infraestrutura tecnológica é um fator preditivo do número de matrículas, com a rede privada apresentando uma vantagem desproporcional.
-    2.  **Causa-Raiz:** A diferença de **7.1x** na média de EQP/Aluno entre redes é a principal evidência da disparidade de investimento.
-    3.  **Insight:** A Região **Sul** (conforme a análise regional) é a que apresenta a maior diferença absoluta na média de EQP/Aluno, indicando que o problema não está restrito às regiões mais carentes, mas é uma questão de política de investimento por dependência administrativa.
-    """)
+    # st.markdown("#### 5.1 Sugestão de Hipóteses e Conclusões (Requisito 3 e 4.1)")
+    # st.markdown("""
+    # 1.  **Hipótese Confirmada:** A infraestrutura tecnológica é um fator preditivo do número de matrículas, com a rede privada apresentando uma vantagem desproporcional.
+    # 2.  **Causa-Raiz:** A diferença de **7.1x** na média de EQP/Aluno entre redes é a principal evidência da disparidade de investimento.
+    # 3.  **Insight:** A Região **Sul** (conforme a análise regional) é a que apresenta a maior diferença absoluta na média de EQP/Aluno, indicando que o problema não está restrito às regiões mais carentes, mas é uma questão de política de investimento por dependência administrativa.
+    # """)
 
-    st.markdown("#### 5.2 Avaliação de Suposições e Ferramentas (Requisito 4.2 e 4.3)")
-    st.markdown("""
-    - **Suposições:** Assumimos que as variáveis de contagem de equipamentos são representativas da qualidade da infraestrutura. A análise estatística (Regressão Linear) validou a relação entre as variáveis.
-    - **Ferramentas:** O projeto utilizou **Pandas** para limpeza e engenharia de *features*, **Matplotlib** e **Seaborn** para visualização e **Scikit-learn** para a modelagem estatística (Regressão Linear), conforme solicitado pelo professor.
-    """)
+    # st.markdown("#### 5.2 Avaliação de Suposições e Ferramentas (Requisito 4.2 e 4.3)")
+    # st.markdown("""
+    # - **Suposições:** Assumimos que as variáveis de contagem de equipamentos são representativas da qualidade da infraestrutura. A análise estatística (Regressão Linear) validou a relação entre as variáveis.
+    # - **Ferramentas:** O projeto utilizou **Pandas** para limpeza e engenharia de *features*, **Matplotlib** e **Seaborn** para visualização e **Scikit-learn** para a modelagem estatística (Regressão Linear), conforme solicitado pelo professor.
+    # """)
 
-    st.markdown("#### 5.3 Coleta de Dados Adicionais (Requisito 4.4)")
-    st.markdown("""
-    Para um estudo mais aprofundado, sugerimos a coleta de dados adicionais:
-    - **Dados Qualitativos:** Nível de treinamento dos professores no uso dessas tecnologias.
-    - **Dados de Uso:** Frequência e forma como os equipamentos são integrados ao currículo pedagógico.
-    - **Dados de Desempenho:** Cruzamento com notas do IDEB para verificar se a infraestrutura se traduz em melhoria de desempenho.
-    """)
-
-    st.markdown("---")
-    st.caption("Desenvolvido por Manus AI - Cientista de Dados (MBA em Ciência de Dados e IA)")
+    # st.markdown("#### 5.3 Coleta de Dados Adicionais (Requisito 4.4)")
+    # st.markdown("""
+    # Para um estudo mais aprofundado, sugerimos a coleta de dados adicionais:
+    # - **Dados Qualitativos:** Nível de treinamento dos professores no uso dessas tecnologias.
+    # - **Dados de Uso:** Frequência e forma como os equipamentos são integrados ao currículo pedagógico.
+    # - **Dados de Desempenho:** Cruzamento com notas do IDEB para verificar se a infraestrutura se traduz em melhoria de desempenho.
+    # """)
 
 # =====================================================
 # 🎓 ABA 1 - CURSOS TÉCNICOS
@@ -520,82 +535,82 @@ with aba4:
 # =====================================================
 # 📈 ABA 5 - INDICADORES NACIONAIS
 # =====================================================
-with aba5:
-    st.subheader("📈 Indicadores Nacionais por Região")
+# with aba5:
+#     st.subheader("📈 Indicadores Nacionais por Região")
 
-    # 1️⃣ Distribuição de Matrículas por Região
-    dados = pd.DataFrame({
-        "Região": ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"],
-        "Percentual": [42.5, 25.0, 15.0, 9.0, 8.5]
-    })
+#     # 1️⃣ Distribuição de Matrículas por Região
+#     dados = pd.DataFrame({
+#         "Região": ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"],
+#         "Percentual": [42.5, 25.0, 15.0, 9.0, 8.5]
+#     })
 
-    grafico_regiao = (
-        alt.Chart(dados)
-        .mark_bar(size=60, cornerRadiusTopLeft=8, cornerRadiusTopRight=8)
-        .encode(
-            x=alt.X("Região:N", sort="-y", title="Região"),
-            y=alt.Y("Percentual:Q", title="Percentual de Matrículas (%)"),
-            color=alt.Color("Região:N", scale=alt.Scale(scheme="tableau20")),
-            tooltip=["Região", "Percentual"]
-        )
-        .properties(title="Distribuição de Matrículas por Região (Censo Escolar 2024)")
-    )
+#     grafico_regiao = (
+#         alt.Chart(dados)
+#         .mark_bar(size=60, cornerRadiusTopLeft=8, cornerRadiusTopRight=8)
+#         .encode(
+#             x=alt.X("Região:N", sort="-y", title="Região"),
+#             y=alt.Y("Percentual:Q", title="Percentual de Matrículas (%)"),
+#             color=alt.Color("Região:N", scale=alt.Scale(scheme="tableau20")),
+#             tooltip=["Região", "Percentual"]
+#         )
+#         .properties(title="Distribuição de Matrículas por Região (Censo Escolar 2024)")
+#     )
 
-    st.altair_chart(grafico_regiao, use_container_width=True, theme="streamlit")
+#     st.altair_chart(grafico_regiao, use_container_width=True, theme="streamlit")
 
-    # 2️⃣ Comparativo entre São Paulo e o conjunto Norte + Centro-Oeste
-    dados_sp = pd.DataFrame({
-        "Categoria": ["São Paulo", "Norte + Centro-Oeste"],
-        "Percentual de Matrículas (%)": [22.0, 17.5]
-    })
+#     # 2️⃣ Comparativo entre São Paulo e o conjunto Norte + Centro-Oeste
+#     dados_sp = pd.DataFrame({
+#         "Categoria": ["São Paulo", "Norte + Centro-Oeste"],
+#         "Percentual de Matrículas (%)": [22.0, 17.5]
+#     })
 
-    grafico_sp = (
-        alt.Chart(dados_sp)
-        .mark_bar(size=80, cornerRadiusTopLeft=8, cornerRadiusTopRight=8)
-        .encode(
-            x=alt.X("Categoria:N", sort="-y"),
-            y=alt.Y("Percentual de Matrículas (%):Q"),
-            color=alt.Color("Categoria:N", scale=alt.Scale(scheme="set2")),
-            tooltip=["Categoria", "Percentual de Matrículas (%)"]
-        )
-        .properties(title="Comparativo: São Paulo vs Norte + Centro-Oeste")
-    )
+#     grafico_sp = (
+#         alt.Chart(dados_sp)
+#         .mark_bar(size=80, cornerRadiusTopLeft=8, cornerRadiusTopRight=8)
+#         .encode(
+#             x=alt.X("Categoria:N", sort="-y"),
+#             y=alt.Y("Percentual de Matrículas (%):Q"),
+#             color=alt.Color("Categoria:N", scale=alt.Scale(scheme="set2")),
+#             tooltip=["Categoria", "Percentual de Matrículas (%)"]
+#         )
+#         .properties(title="Comparativo: São Paulo vs Norte + Centro-Oeste")
+#     )
 
-    st.altair_chart(grafico_sp, use_container_width=True, theme="streamlit")
-    st.markdown("<br><br>", unsafe_allow_html=True)
+#     st.altair_chart(grafico_sp, use_container_width=True, theme="streamlit")
+#     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # 3️⃣ Distribuição Urbana x Rural (Gráfico de Pizza)
-    dados_local = pd.DataFrame({
-        "Localização": ["Urbana", "Rural"],
-        "Percentual": [95.1, 4.9]
-    })
+#     # 3️⃣ Distribuição Urbana x Rural (Gráfico de Pizza)
+#     dados_local = pd.DataFrame({
+#         "Localização": ["Urbana", "Rural"],
+#         "Percentual": [95.1, 4.9]
+#     })
 
-    grafico_local = (
-        alt.Chart(dados_local)
-        .mark_arc(innerRadius=50, outerRadius=120)
-        .encode(
-            theta=alt.Theta("Percentual:Q", title="Percentual de Matrículas"),
-            color=alt.Color("Localização:N", scale=alt.Scale(scheme="tableau10")),
-            tooltip=["Localização", "Percentual"]
-        )
-        .properties(title="Distribuição das Matrículas: Urbana vs Rural")
-    )
+#     grafico_local = (
+#         alt.Chart(dados_local)
+#         .mark_arc(innerRadius=50, outerRadius=120)
+#         .encode(
+#             theta=alt.Theta("Percentual:Q", title="Percentual de Matrículas"),
+#             color=alt.Color("Localização:N", scale=alt.Scale(scheme="tableau10")),
+#             tooltip=["Localização", "Percentual"]
+#         )
+#         .properties(title="Distribuição das Matrículas: Urbana vs Rural")
+#     )
 
-    st.altair_chart(grafico_local, use_container_width=True, theme="streamlit")
+#     st.altair_chart(grafico_local, use_container_width=True, theme="streamlit")
 
-    # Texto explicativo
-    st.markdown("""
-    ### 📊 Análise dos Indicadores Nacionais
-    - O **Sudeste** concentra **42,5%** das matrículas, reforçando o peso econômico e populacional da região.  
-    - O **Nordeste** é a **segunda maior região** em número de matrículas (25%), destacando avanços na cobertura educacional.  
-    - Apenas **4,9% das matrículas** ocorrem em áreas **rurais**, revelando desafios de acesso fora dos centros urbanos.  
-    - **São Paulo**, isoladamente, concentra **22% das matrículas do país**, superando a soma das regiões **Norte e Centro-Oeste**.  
-    """)
+#     # Texto explicativo
+#     st.markdown("""
+#     ### 📊 Análise dos Indicadores Nacionais
+#     - O **Sudeste** concentra **42,5%** das matrículas, reforçando o peso econômico e populacional da região.  
+#     - O **Nordeste** é a **segunda maior região** em número de matrículas (25%), destacando avanços na cobertura educacional.  
+#     - Apenas **4,9% das matrículas** ocorrem em áreas **rurais**, revelando desafios de acesso fora dos centros urbanos.  
+#     - **São Paulo**, isoladamente, concentra **22% das matrículas do país**, superando a soma das regiões **Norte e Centro-Oeste**.  
+#     """)
 
 # =====================================================
 # 📊 ABA 6 - ESTATÍSTICA DESCRITIVA
 # =====================================================
-with aba6:
+# with aba6:
     st.header("📊 Análise Estatística Descritiva")
 
     # 🔹 Seleciona colunas numéricas e categóricas
