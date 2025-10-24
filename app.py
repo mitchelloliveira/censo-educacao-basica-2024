@@ -22,9 +22,9 @@ st.title("📊 Dashboard - Censo da Educação Básica e Cursos Técnicos 2024")
 # 📂 Caminhos dos Arquivos
 # --------------------------------------------
 # base = Path(r"C:\Users\gracabezerra\OneDrive - SENAC Pernambuco\Documentos\Python_work\microdados_censo_escolar_2024\microdados_censo_escolar_2024\dados")
-base = Path(r"C:\Projetos\MBA\microdados_censo_escolar_2024\dados")
-arq_micro = base / "microdados_ed_basica_2024.csv"
-arq_suple = base / "suplemento_cursos_tecnicos_2024.csv"
+# base = Path(r"C:\Projetos\MBA\microdados_censo_escolar_2024\dados")
+arq_micro = "./microdados_ed_basica_2024.csv"
+arq_suple = "./suplemento_cursos_tecnicos_2024.csv"
 
 # CSV específico da análise de storytelling (ficar ao lado do app, ou ajuste o path conforme necessário)
 arq_story = Path("dados_limpos_educacao.csv")
